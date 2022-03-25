@@ -50,6 +50,7 @@ send-build-metrics:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # If you didn't manage to set WORKFLOW_STATUS using the above step, it will report `undefined`
         WORKFLOW_STATUS: ${{ env.WORKFLOW_STATUS }}
+        LOG_GROUP_NAME: ${{ env.LOG_GROUP_NAME }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: 'us-west-2' # this defaults to us-west-2, which is where we want things, no need to send at the moment

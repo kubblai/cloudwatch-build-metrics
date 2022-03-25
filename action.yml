@@ -7,6 +7,9 @@ description: "Send build information and metrics to CloudWatch logs"
 # so we'll take an input to show what the actual status was
 
 inputs:
+  LOG_GROUP_NAME:
+    description: "Desired log group name in cloudwatch"
+    required: true
   GITHUB_TOKEN:
     description: "Github token to allow API requests. Pass in as env.GITHUB_TOKEN"
     required: true
@@ -113,7 +116,7 @@ runs:
         export AWS_ACCESS_KEY_ID="${{inputs.AWS_ACCESS_KEY_ID}}"
         export AWS_SECRET_ACCESS_KEY="${{inputs.AWS_SECRET_ACCESS_KEY}}"
         export AWS_REGION="${{inputs.AWS_REGION}}"
-
+        
 
 
         #######  Now we get and process the JSON
@@ -200,6 +203,7 @@ runs:
         export AWS_ACCESS_KEY_ID="${{inputs.AWS_ACCESS_KEY_ID}}"
         export AWS_SECRET_ACCESS_KEY="${{inputs.AWS_SECRET_ACCESS_KEY}}"
         export AWS_REGION="${{inputs.AWS_REGION}}"
+        export LOG_GROUP_NAME="${{inputs.LOG_GROUP_NAME}}"
 
 
         ########  Setup retry options for the AWS CLI - adaptive mode is experimental but should handle this well.
@@ -218,7 +222,7 @@ runs:
 
         echo "Creating log stream $LOG_STREAM_NAME"
         createoutput=$(aws logs create-log-stream \
-        --log-group-name "/github/actions/pipelines" \
+        --log-group-name "$LOG_GROUP_NAME" \
         --log-stream-name "$LOG_STREAM_NAME" 2>&1) && cls_exit_status=$? || cls_exit_status=$?
 
         if [ "$cls_exit_status" = 0 ]; then
@@ -236,7 +240,7 @@ runs:
         ########  This slaps the JSON into CloudWatch, then we can query it.
         echo "Sending logs to log stream $LOG_STREAM_NAME"
         putoutput=$(aws logs put-log-events \
-        --log-group-name "/github/actions/pipelines" \
+        --log-group-name "$LOG_GROUP_NAME" \
         --log-stream-name "$LOG_STREAM_NAME" \
         --log-events file://$RUNNER_TEMP/build_log.json 2>&1) && ple_exit_status=$? || ple_exit_status=$?
 
